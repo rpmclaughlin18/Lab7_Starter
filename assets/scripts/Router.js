@@ -53,7 +53,6 @@ export class Router {
           history.pushState({page: page}, "", " ");
         else
           history.pushState({page: page}, "", (location.hash)+"#"+page);
-        history.forward();
       }
     }
  }
