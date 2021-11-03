@@ -1,7 +1,6 @@
 // main.js
 
 import { Router } from './router.js';
-
 const recipes = [
   'https://introweb.tech/assets/json/ghostCookies.json',
   'https://introweb.tech/assets/json/birthdayCake.json',
@@ -22,6 +21,19 @@ const router = new Router(function () {
    * are removing any "shown" classes on <sections> you don't want to display, this home method should
    * be called more than just at the start. You should only really need two lines for this function.
    */
+  // remove shown
+
+  //element.classList ???
+  let elem = document.getElementsByClassName('section--recipe-cards')[0]
+  elem.classList.add('shown');
+  elem.classList.remove('hidden');
+  //console.log(elem.classList);
+
+  let elem1 = document.getElementsByClassName('section--recipe-expand');
+
+  for(let i = 0; i < elem1.length; i++) {
+    elem1[i].classList.remove('shown');
+  }
 });
 
 window.addEventListener('DOMContentLoaded', init);
@@ -47,6 +59,7 @@ async function init() {
   // as minimizes the amount of "page flashing" from the home --> new page
   let page = window.location.hash.slice(1);
   if (page == '') page = 'home';
+  
   router.navigate(page);
 }
 
@@ -59,6 +72,18 @@ function initializeServiceWorker() {
    *  TODO - Part 2
    *  Initialize the service worker set up in sw.js
    */
+
+   if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        // Registration was successful
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function(err) {
+        // registration failed :(
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  }
 }
 
 /**
@@ -109,6 +134,22 @@ function createRecipeCards() {
      * Again - the functions here should be swapping around the "shown" class only, simply
      * add this class to the correct <section> to display that section
      */
+
+    // create page path and hash
+    let page = recipeCard.data['page-name'];
+
+    // associate function to page
+    router.addPage(page, () => {
+      let section = document.getElementsByClassName('section--recipe-expand')[0];
+      section.classList.add('shown');
+      const recipeExpand = document.getElementsByTagName('recipe-expand')[0];
+      recipeExpand.data = recipeCard.data;
+      document.getElementsByClassName('section--recipe-cards')[0].classList.add('hidden');
+    })
+
+    // bind function to click
+    bindRecipeCard(recipeCard, page);
+
     if (i >= 3) recipeCard.classList.add('hidden');
     document.querySelector('.recipe-cards--wrapper').appendChild(recipeCard);
   }
@@ -154,6 +195,9 @@ function bindRecipeCard(recipeCard, pageName) {
    * TODO - Part 1
    * Fill in this function as specified in the comment above
    */
+  recipeCard.addEventListener('click', () => {
+    router.navigate(pageName);
+  })
 }
 
 /**
@@ -165,6 +209,10 @@ function bindEscKey() {
    * TODO - Part 1
    * Fill in this function as specified in the comment above
    */
+  document.addEventListener('keyup', (e) => {
+    if(e.key == "Escape")
+      router.navigate('home')
+    });
 }
 
 /**
@@ -179,4 +227,10 @@ function bindPopstate() {
    * TODO - Part 1
    * Fill in this function as specified in the comment above
    */
+
+  window.addEventListener('popstate', () => {
+    if(history.state){
+      router.navigate(history.state["page"], true);
+    }
+  })
 }

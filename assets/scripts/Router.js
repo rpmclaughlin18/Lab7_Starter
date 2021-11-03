@@ -11,7 +11,7 @@
   *     It's accessible via window.location.hash and using them lets you
   *     easily modify the URL without refreshing the page or anything
   */
-
+const funcs = {}
 export class Router {
   /**
    * Sets up the home function, the page name should always be 'home', which
@@ -20,10 +20,7 @@ export class Router {
    *                            visually
    */
   constructor(homeFunc) {
-    /**
-     * TODO Part 1
-     * Fill in this function as specified in the comment above
-     */
+    this.addPage('home', homeFunc);
   }
 
   /**
@@ -38,6 +35,7 @@ export class Router {
      * TODO Part 1
      * Fill in this function as specified in the comment above
      */
+    funcs[page] = pageFunc;
   }
 
   /**
@@ -48,9 +46,16 @@ export class Router {
    *                              'popstate' event instead of a normal card click
    */
   navigate(page, statePopped) {
-    /**
-     * TODO Part 1
-     * Fill in this function as specified in the comment above
-     */
-  }
+    if (funcs[page]){
+      funcs[page].call();
+      if(!statePopped){
+        if(page == 'home')
+          history.pushState({page: page}, "", " ");
+        else
+          history.pushState({page: page}, "", (location.hash)+"#"+page);
+        console.log(history);
+        history.forward();
+      }
+    }
+ }
 }
