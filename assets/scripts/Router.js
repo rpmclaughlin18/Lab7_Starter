@@ -48,12 +48,12 @@ export class Router {
   navigate(page, statePopped) {
     if (funcs[page]){
       funcs[page].call();
-      if(!statePopped){
-        if(page == 'home')
-          history.pushState({page: page}, "", " ");
-        else
-          history.pushState({page: page}, "", (location.hash)+"#"+page);
-      }
+      //if(!statePopped){
+       // if(page == 'home')
+          //history.pushState({page: page}, "", " ");
+        //else
+         // history.pushState({page: page}, "", (location.hash)+"#"+page);
+     // }
     }
  }
 }
